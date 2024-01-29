@@ -14,6 +14,7 @@ import { AuthModule } from './features/auth/auth.module';
 import secretConfigFactory from './config/secret.config';
 
 import { ResponseInterceptor } from './core/interceptors/response/response.interceptor';
+import { TodoModule } from './features/todo/todo.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ResponseInterceptor } from './core/interceptors/response/response.inter
     }),
     UserModule,
     AuthModule,
+    TodoModule,
   ],
   controllers: [AppController],
   providers: [

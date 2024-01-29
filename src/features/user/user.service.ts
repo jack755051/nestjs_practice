@@ -1,3 +1,4 @@
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './../../typeorm/entities/user.entity';
 import { CommonUtility } from './../../core/util/common.utility';
 import { Injectable } from '@nestjs/common';
@@ -55,5 +56,53 @@ export class UserService {
   public async hasUser() {
     const count = await this.userRepository.count();
     return count > 0;
+  }
+
+  public async deleteUser(uuid: string) {
+    await this.userRepository.delete({ uuid: uuid });
+    return {};
+  }
+
+  /**
+   * 更新user資訊
+   * @param uuid
+   * @param data
+   * @returns
+   */
+  public async updateUser(uuid: string, data: UpdateUserDto) {
+    //找到欲修改的user
+    const user = await this.userRepository.findOne({ where: { uuid } });
+    const { name, password, email, role } = data;
+    //處理密碼
+    const { hash, salt } = CommonUtility.encryptBySalt(password);
+
+    // await this.userRepository.update({ name: user.name }, { name: name });
+
+    // await this.userRepository.update(
+    //   { passwordHash: user.passwordHash },
+    //   { passwordHash: hash },
+    // );
+
+    // await this.userRepository.update(
+    //   { passwordSalt: user.passwordSalt },
+    //   { passwordSalt: salt },
+    // );
+
+    // await this.userRepository.update({ email: user.email }, { email: email });
+    // await this.userRepository.update({ role: user.role }, { role: role });
+
+    // 使用一次 update 調用來更新所有字段
+    await this.userRepository.update(
+      { uuid },
+      {
+        name: name,
+        passwordHash: hash,
+        passwordSalt: salt,
+        email: email,
+        role: role,
+      },
+    );
+
+    return this.userRepository.save(user);
   }
 }
